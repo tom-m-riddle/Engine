@@ -132,7 +132,7 @@ class PNPipeline: PNStage {
             commandBuffer.present(drawable)
         }
     }
-    func draw(commandQueue: MTLCommandQueue, supply: PNFrameSupply) {
+    func draw(commandQueue: MTLCommandQueue, supply: PNFrameSupply, onComplete: @escaping () -> Void) {
         let wholeEncoding = psignposter.beginInterval("Whole encoding")
         var commandBuffers = [String: MTLCommandBuffer]()
         singlethreadVisitor.visit { node in
@@ -157,8 +157,8 @@ class PNPipeline: PNStage {
         guard let commandBuffer = commandQueue.makeCommandBuffer() else {
             fatalError("Could not prepare command buffer for synchronization")
         }
+        commandBuffer.addCompletedHandler { _ in onComplete() }
         commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
         psignposter.endInterval("Whole encoding", wholeEncoding)
     }
 }

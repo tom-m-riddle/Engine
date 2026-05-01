@@ -4,5 +4,5 @@
 
 /// Supervises and manages the rendering process.
 public protocol PNRenderingCoordinator {
-    mutating func draw(frameSupply: PNFrameSupply)
+    mutating func draw(frameSupply: PNFrameSupply, onComplete: @escaping () -> Void)
 }

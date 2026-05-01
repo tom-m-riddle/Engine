@@ -12,55 +12,56 @@ public class PNIThreadedWorkloadManager: PNWorkloadManager {
     private let dispatchQueue = DispatchQueue.global()
     private let dispatchGroup = DispatchGroup()
     private let nodeUpdate = PNNodeUpdater()
-    private var frameSupplies: PNIBufferedValue<PNFrameSupply>
+    private var supplies: [PNFrameSupply]
+    private var writeIndex = 0
+    private let semaphore = DispatchSemaphore(value: 3)
     private var previousFrameScene: PNSceneDescription?
-    public init(bufferStores: (PNBufferStore, PNBufferStore),
+    public init(bufferStores: (PNBufferStore, PNBufferStore, PNBufferStore),
                 renderingCoordinator: PNRenderingCoordinator,
                 renderMaskGenerator: PNRenderMaskGenerator,
                 transcriber: PNTranscriber) {
         self.renderingCoordinator = renderingCoordinator
         self.transcriber = transcriber
         self.renderMaskGenerator = renderMaskGenerator
-        frameSupplies = PNIBufferedValue(PNFrameSupply(scene: PNSceneDescription(),
-                                                       bufferStore: bufferStores.0,
-                                                       mask: .empty),
-                                         PNFrameSupply(scene: PNSceneDescription(),
-                                                       bufferStore: bufferStores.1,
-                                                       mask: .empty))
+        supplies = [
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.0, mask: .empty),
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.1, mask: .empty),
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.2, mask: .empty)
+        ]
     }
     public func draw(sceneGraph: PNScene, taskQueue: PNRepeatableTaskQueue) {
+        semaphore.wait()
+        let slotIdx = writeIndex % 3
+        let slot = supplies[slotIdx]
         dispatchGroup.enter()
         dispatchQueue.async { [unowned self] in
             let backgroundUpdateInterval = psignposter.beginInterval("Background update")
             taskQueue.execute()
             nodeUpdate.update(rootNode: sceneGraph.rootNode)
             let scene = transcriber.transcribe(scene: sceneGraph)
-            let inactive = frameSupplies.pullInactive
             if PNDefaults.shared.debug.boundingBoxes {
                 let geometry = PNBoundingBoxCreator.vertices(boundingBoxes: scene.boundingBoxes)
-                inactive.bufferStore.boundingBoxes.upload(data: geometry)
+                slot.bufferStore.boundingBoxes.upload(data: geometry)
             }
-            inactive.bufferStore.matrixPalettes.upload(data: scene.palettes)
-            inactive.bufferStore.ambientLights.upload(data: scene.ambientLights)
-            inactive.bufferStore.omniLights.upload(data: scene.omniLights)
-            inactive.bufferStore.directionalLights.upload(data: scene.directionalLights)
-            inactive.bufferStore.spotLights.upload(data: scene.spotLights)
-            inactive.bufferStore.cameras.upload(data: scene.cameraUniforms)
-            inactive.bufferStore.modelCoordinateSystems.upload(data: scene.uniforms)
+            slot.bufferStore.matrixPalettes.upload(data: scene.palettes)
+            slot.bufferStore.ambientLights.upload(data: scene.ambientLights)
+            slot.bufferStore.omniLights.upload(data: scene.omniLights)
+            slot.bufferStore.directionalLights.upload(data: scene.directionalLights)
+            slot.bufferStore.spotLights.upload(data: scene.spotLights)
+            slot.bufferStore.cameras.upload(data: scene.cameraUniforms)
+            slot.bufferStore.modelCoordinateSystems.upload(data: scene.uniforms)
             let previous = previousFrameScene ?? scene
-            inactive.bufferStore.previousMatrixPalettes.upload(data: previous.palettes)
-            inactive.bufferStore.previousModelCoordinateSystems.upload(data: previous.uniforms)
-            let supply = PNFrameSupply(scene: scene,
-                                       bufferStore: inactive.bufferStore,
-                                       mask: renderMaskGenerator.generate(scene: scene))
-            frameSupplies.push(supply)
+            slot.bufferStore.previousMatrixPalettes.upload(data: previous.palettes)
+            slot.bufferStore.previousModelCoordinateSystems.upload(data: previous.uniforms)
+            supplies[slotIdx] = PNFrameSupply(scene: scene,
+                                              bufferStore: slot.bufferStore,
+                                              mask: renderMaskGenerator.generate(scene: scene))
             previousFrameScene = scene
             psignposter.endInterval("Background update", backgroundUpdateInterval)
             dispatchGroup.leave()
         }
-        renderingCoordinator.draw(frameSupply: frameSupplies.pull)
         dispatchGroup.wait()
-        frameSupplies.swap()
+        renderingCoordinator.draw(frameSupply: supplies[slotIdx], onComplete: { [weak self] in self?.semaphore.signal() })
+        writeIndex += 1
     }
-
 }
