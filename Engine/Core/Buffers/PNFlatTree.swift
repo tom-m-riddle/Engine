@@ -15,6 +15,7 @@ public struct PNFlatTreeNode<T> {
 /// A structure representing a tree backed by an array.
 public struct PNFlatTree<T> {
     private var objects: [PNFlatTreeNode<T>]
+    private var childrenMap: [PNIndex: [PNIndex]] = [:]
     public var count: Int {
         objects.count
     }
@@ -32,7 +33,9 @@ public struct PNFlatTree<T> {
                "Parent index if non-nil \(Int.nil) must refer to an exisitng node")
         assert(parentIdx >= Int.nil,
                "Parent index value cannot be lower than 0 or different than \(Int.nil)")
+        let newIdx = objects.count
         objects.append(PNFlatTreeNode(parentIdx: parentIdx, data: data))
+        childrenMap[parentIdx, default: []].append(newIdx)
     }
     public subscript(index: PNIndex) -> PNFlatTreeNode<T> {
         get {
@@ -42,7 +45,7 @@ public struct PNFlatTree<T> {
         }
     }
     public func children(of idx: PNIndex) -> [PNIndex] {
-        objects.indices.filter { objects[$0].parentIdx == idx }
+        childrenMap[idx] ?? []
     }
     public func descendants(of idx: PNIndex) -> [PNIndex] {
         let nearChildren = children(of: idx)
