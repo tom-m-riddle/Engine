@@ -22,12 +22,13 @@ struct PNIRenderingCoordinator: PNRenderingCoordinator {
         self.pipeline = pipeline
         self.commandQueue = commandQueue
     }
-    mutating func draw(frameSupply: PNFrameSupply) {
+    mutating func draw(frameSupply: PNFrameSupply, onComplete: @escaping () -> Void) {
         guard frameSupply.scene.activeCameraIdx != .nil else {
+            onComplete()
             return
         }
         let encodingInterval = psignposter.beginInterval("Frame encoding")
-        pipeline.draw(commandQueue: commandQueue, supply: frameSupply)
+        pipeline.draw(commandQueue: commandQueue, supply: frameSupply, onComplete: onComplete)
         psignposter.endInterval("Frame encoding", encodingInterval)
     }
 }

@@ -8,10 +8,11 @@ public struct PNIThreadedWorkloadManagerFactory: PNWorkloadManagerFactory {
                     renderingCoordinator: PNRenderingCoordinator,
                     renderMaskGenerator: PNRenderMaskGenerator) -> PNWorkloadManager? {
         guard let bufferStoreA = bufferStoreFactory.new(),
-              let bufferStoreB = bufferStoreFactory.new() else {
+              let bufferStoreB = bufferStoreFactory.new(),
+              let bufferStoreC = bufferStoreFactory.new() else {
                   return nil
         }
-        return PNIThreadedWorkloadManager(bufferStores: (bufferStoreA, bufferStoreB),
+        return PNIThreadedWorkloadManager(bufferStores: (bufferStoreA, bufferStoreB, bufferStoreC),
                                           renderingCoordinator: renderingCoordinator,
                                           renderMaskGenerator: renderMaskGenerator,
                                           transcriber: PNITranscriber.default)

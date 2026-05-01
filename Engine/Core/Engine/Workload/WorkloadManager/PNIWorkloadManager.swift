@@ -10,6 +10,7 @@ public class PNIWorkloadManager: PNWorkloadManager {
     private let renderMaskGenerator: PNRenderMaskGenerator
     private var previousFrameScene: PNSceneDescription?
     private let nodeUpdate = PNNodeUpdater()
+    private let semaphore = DispatchSemaphore(value: 1)
     public init(bufferStore: PNBufferStore,
                 renderingCoordinator: PNRenderingCoordinator,
                 renderMaskGenerator: PNRenderMaskGenerator,
@@ -20,6 +21,7 @@ public class PNIWorkloadManager: PNWorkloadManager {
         self.renderMaskGenerator = renderMaskGenerator
     }
     public func draw(sceneGraph: PNScene, taskQueue: PNRepeatableTaskQueue) {
+        semaphore.wait()
         taskQueue.execute()
         nodeUpdate.update(rootNode: sceneGraph.rootNode)
         let scene = transcriber.transcribe(scene: sceneGraph)
@@ -41,6 +43,6 @@ public class PNIWorkloadManager: PNWorkloadManager {
                                    bufferStore: bufferStore,
                                    mask: renderMaskGenerator.generate(scene: scene))
         previousFrameScene = scene
-        renderingCoordinator.draw(frameSupply: supply)
+        renderingCoordinator.draw(frameSupply: supply, onComplete: { [weak self] in self?.semaphore.signal() })
     }
 }
