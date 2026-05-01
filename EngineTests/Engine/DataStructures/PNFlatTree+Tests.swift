@@ -85,4 +85,43 @@ class PNFlatTreeTests: XCTestCase {
         XCTAssertEqual(tree[0].data, 100)
         XCTAssertEqual(tree[0].parentIdx, .nil)
     }
+    func testMultipleRoots() throws {
+        var tree = PNFlatTree<Int>()
+        tree.add(parentIdx: .nil, data: 10)
+        tree.add(parentIdx: .nil, data: 20)
+        tree.add(parentIdx: .nil, data: 30)
+        XCTAssertEqual(tree.children(of: .nil), [0, 1, 2])
+    }
+    func testLeafNodeHasNoChildren() throws {
+        var tree = PNFlatTree<Int>()
+        tree.add(parentIdx: .nil, data: 10)
+        tree.add(parentIdx: 0, data: 20)
+        XCTAssertEqual(tree.children(of: 1), [])
+        XCTAssertEqual(tree.descendants(of: 1), [])
+    }
+    func testDescendantsThreeLevelsDeep() throws {
+        var tree = PNFlatTree<Int>()
+        tree.add(parentIdx: .nil, data: 0)  // 0
+        tree.add(parentIdx: 0, data: 1)     // 1
+        tree.add(parentIdx: 0, data: 2)     // 2
+        tree.add(parentIdx: 1, data: 3)     // 3
+        tree.add(parentIdx: 1, data: 4)     // 4
+        tree.add(parentIdx: 2, data: 5)     // 5
+        // descendants of root: children before their own descendants (BFS-like)
+        XCTAssertEqual(tree.descendants(of: .nil), [0, 1, 2, 3, 4, 5])
+        // subtree rooted at node 1
+        XCTAssertEqual(tree.descendants(of: 1), [3, 4])
+        // subtree rooted at node 2
+        XCTAssertEqual(tree.descendants(of: 2), [5])
+    }
+    func testDescendantsPerformance() {
+        var tree = PNFlatTree<Int>()
+        tree.add(parentIdx: .nil, data: 0)
+        for i in 0 ..< 999 {
+            tree.add(parentIdx: i, data: i + 1)
+        }
+        measure {
+            _ = tree.descendants(of: .nil)
+        }
+    }
 }
