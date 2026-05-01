@@ -44,19 +44,24 @@ kernel void kernelSSAO(texture2d<half, access::read> nm [[texture(kAttributeSsao
     float3 tangent = normalize(randomVector - normal * dot(randomVector, normal));
     float3 bitangent = normalize(cross(normal, tangent));
     float3x3 TBN = float3x3(tangent, bitangent, normal);
+    float fx = camera.projectionMatrix[0][0];
+    float fy = camera.projectionMatrix[1][1];
+    float cx = camera.projectionMatrix[2][0];
+    float cy = camera.projectionMatrix[2][1];
+    float invNegCenterW = 1.0 / (-worldPosition.z);
+    float2 ndcToTexScale = float2(resolutionMultiplier.x * 0.5, -resolutionMultiplier.y * 0.5);
+    float2 ndcToTexBias  = float2(resolutionMultiplier.x * 0.5,  resolutionMultiplier.y * 0.5);
+    float occlusionThreshold = worldPosition.z + comparisonBias;
     half occlusion = 0.0;
     for(int i = 0; i < sampleCount; ++i) {
-        float3 neighbourWorldPosition = worldPosition + (TBN * samples[i]);
-        float4 neighbourClipPosition = camera.projectionMatrix * float4(neighbourWorldPosition, 1);
-        neighbourClipPosition /= neighbourClipPosition.w;
-        neighbourClipPosition = neighbourClipPosition * 0.5 + 0.5;
-        neighbourClipPosition.y = (1 - neighbourClipPosition.y);
-        neighbourClipPosition.xy *= resolutionMultiplier;
-        uint2 sampleXY = uint2(neighbourClipPosition.xy);
+        float3 samplePos = worldPosition + (TBN * samples[i]);
+        float2 sampleNDC = float2(fx * samplePos.x + cx * samplePos.z,
+                                  fy * samplePos.y + cy * samplePos.z) * invNegCenterW;
+        uint2 sampleXY = uint2(sampleNDC * ndcToTexScale + ndcToTexBias);
         float neighbourDepth = pr.read(sampleXY).z;
         float depthDiff = abs(worldPosition.z - neighbourDepth);
         float rangeCheck = smoothstep(0.0, 1.0, radius / max(depthDiff, 1e-5));
-        occlusion += (neighbourDepth >= worldPosition.z + comparisonBias ? 1.0 : 0.0) * rangeCheck;
+        occlusion += (neighbourDepth >= occlusionThreshold ? 1.0 : 0.0) * rangeCheck;
     }
     half finalOcclusion = 1.0 - (occlusion / sampleCount);
     out.write(pow(finalOcclusion, power), positionXY);
