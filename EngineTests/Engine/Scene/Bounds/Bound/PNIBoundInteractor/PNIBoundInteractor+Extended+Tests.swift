@@ -103,12 +103,12 @@ class PNIBoundInteractorExtendedTests: XCTestCase {
         let b = PNBound(min: [0, 0, 0], max: [2, 1, 3])
         let rotation = simd_float4x4(simd_quatf(angle: .pi / 2, axis: [0, 1, 0]))
         let result = interactor.multiply(rotation, b)
-        XCTAssertEqual(result.min.x,  0, accuracy: 1e-5)
-        XCTAssertEqual(result.min.y,  0, accuracy: 1e-5)
+        XCTAssertEqual(result.min.x, 0, accuracy: 1e-5)
+        XCTAssertEqual(result.min.y, 0, accuracy: 1e-5)
         XCTAssertEqual(result.min.z, -2, accuracy: 1e-5)
-        XCTAssertEqual(result.max.x,  3, accuracy: 1e-5)
-        XCTAssertEqual(result.max.y,  1, accuracy: 1e-5)
-        XCTAssertEqual(result.max.z,  0, accuracy: 1e-5)
+        XCTAssertEqual(result.max.x, 3, accuracy: 1e-5)
+        XCTAssertEqual(result.max.y, 1, accuracy: 1e-5)
+        XCTAssertEqual(result.max.z, 0, accuracy: 1e-5)
     }
     func testFromInverseProjectionOrthographic() throws {
         let original = PNBound(min: [-5, -3, 0], max: [5, 3, 10])

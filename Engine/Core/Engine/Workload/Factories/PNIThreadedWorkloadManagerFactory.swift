@@ -12,7 +12,9 @@ public struct PNIThreadedWorkloadManagerFactory: PNWorkloadManagerFactory {
               let bufferStoreC = bufferStoreFactory.new() else {
                   return nil
         }
-        return PNIThreadedWorkloadManager(bufferStores: (bufferStoreA, bufferStoreB, bufferStoreC),
+        return PNIThreadedWorkloadManager(bufferStores: [bufferStoreA,
+                                                         bufferStoreB,
+                                                         bufferStoreC],
                                           renderingCoordinator: renderingCoordinator,
                                           renderMaskGenerator: renderMaskGenerator,
                                           transcriber: PNITranscriber.default)

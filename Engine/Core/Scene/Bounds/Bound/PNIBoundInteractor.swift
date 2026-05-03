@@ -89,7 +89,7 @@ public struct PNIBoundInteractor: PNBoundInteractor {
     public func from(inverseProjection: simd_float4x4) -> PNBound {
         let ndcCorners: [simd_float4] = [
             [-1, -1, 0, 1], [ 1, -1, 0, 1], [-1, -1, 1, 1], [ 1, -1, 1, 1],
-            [-1,  1, 0, 1], [ 1,  1, 0, 1], [-1,  1, 1, 1], [ 1,  1, 1, 1]
+            [-1, 1, 0, 1], [ 1, 1, 0, 1], [-1, 1, 1, 1], [ 1, 1, 1, 1]
         ]
         return from(ndcCorners.map { v -> simd_float3 in
             var p = inverseProjection * v
