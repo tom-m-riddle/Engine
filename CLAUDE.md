@@ -44,6 +44,7 @@ mdl .            # Markdown files
 ### Rendering Pipeline
 
 The engine uses a **deferred rendering pipeline** implemented in Metal. Shaders live in `Engine/Shaders/` and cover:
+
 - PBR shading with normal mapping and translucency
 - Shadow mapping for point, spot, and directional lights (PCF soft shadows)
 - Post-processing: bloom, motion blur, film grain, vignette, distance fog
