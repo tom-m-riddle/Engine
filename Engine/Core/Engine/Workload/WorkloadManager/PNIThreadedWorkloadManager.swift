@@ -16,17 +16,18 @@ public class PNIThreadedWorkloadManager: PNWorkloadManager {
     private var writeIndex = 0
     private let semaphore = DispatchSemaphore(value: 3)
     private var previousFrameScene: PNSceneDescription?
-    public init(bufferStores: (PNBufferStore, PNBufferStore, PNBufferStore),
+    public init(bufferStores: [PNBufferStore],
                 renderingCoordinator: PNRenderingCoordinator,
                 renderMaskGenerator: PNRenderMaskGenerator,
                 transcriber: PNTranscriber) {
+        precondition(bufferStores.count == 3, "Buffer stores must contain exactly 3 items")
         self.renderingCoordinator = renderingCoordinator
         self.transcriber = transcriber
         self.renderMaskGenerator = renderMaskGenerator
-        supplies = [
-            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.0, mask: .empty),
-            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.1, mask: .empty),
-            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores.2, mask: .empty)
+        self.supplies = [
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores[0], mask: .empty),
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores[1], mask: .empty),
+            PNFrameSupply(scene: PNSceneDescription(), bufferStore: bufferStores[2], mask: .empty)
         ]
     }
     public func draw(sceneGraph: PNScene, taskQueue: PNRepeatableTaskQueue) {
@@ -40,7 +41,7 @@ public class PNIThreadedWorkloadManager: PNWorkloadManager {
             nodeUpdate.update(rootNode: sceneGraph.rootNode)
             let scene = transcriber.transcribe(scene: sceneGraph)
             if PNDefaults.shared.debug.boundingBoxes {
-                let geometry = PNBoundingBoxCreator.vertices(boundingBoxes: scene.boundingBoxes)
+                let geometry = PNBoundingBoxCreator.vertices(bounds: scene.bounds)
                 slot.bufferStore.boundingBoxes.upload(data: geometry)
             }
             slot.bufferStore.matrixPalettes.upload(data: scene.palettes)

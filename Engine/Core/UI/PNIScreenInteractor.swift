@@ -7,7 +7,6 @@ import ZPack
 
 class PNIScreenInteractor: PNScreenInteractor {
     private let boundInteractor = PNIBoundInteractor()
-    private let boundingBoxInteractor = PNIBoundingBoxInteractor.default
     private let nodeInteractor = PNINodeInteractor()
     init() {
         // Default
@@ -26,10 +25,10 @@ class PNIScreenInteractor: PNScreenInteractor {
         let rayEye = PNRay(origin: origin, direction: direction.xyz.normalized)
         let rayWorld = cameraNode.worldTransform * rayEye
         return nodeInteractor.deepSearch(from: scene.rootNode) { node in
-            guard let value = node.data.worldBoundingBox else {
+            guard let value = node.data.worldBound else {
                 return false
             }
-            return boundInteractor.intersect(boundingBoxInteractor.bound(value), ray: rayWorld)
+            return boundInteractor.intersect(value, ray: rayWorld)
         }
     }
 }

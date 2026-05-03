@@ -6,11 +6,8 @@ import simd
 
 public struct PNIRenderMaskGenerator: PNRenderMaskGenerator {
     private let cullingController: PNCullingController
-    private let interactor: PNBoundingBoxInteractor
-    init(cullingController: PNCullingController,
-         interactor: PNBoundingBoxInteractor) {
+    init(cullingController: PNCullingController) {
         self.cullingController = cullingController
-        self.interactor = interactor
     }
     public func generate(scene: PNSceneDescription) -> PNRenderMask {
         PNRenderMask(cameras: generateCameraRenderMask(scene: scene),
@@ -33,9 +30,9 @@ public struct PNIRenderMaskGenerator: PNRenderMaskGenerator {
         }
     }
     private func mask(scene: PNSceneDescription, for index: Int) -> [Bool] {
-        guard let bb = scene.boundingBoxes[index] else {
-            return Array(repeating: false, count: scene.boundingBoxes.count)
+        guard let bound = scene.bounds[index] else {
+            return Array(repeating: false, count: scene.bounds.count)
         }
-        return cullingController.cullingMask(scene: scene, boundingBox: bb)
+        return cullingController.cullingMask(scene: scene, bound: bound)
     }
 }

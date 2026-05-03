@@ -23,9 +23,8 @@ extension PNMesh {
                                         indexType: .uint16,
                                         primitiveType: .triangle)
         let pieceDescription = PNPieceDescription(drawDescription: drawDescription)
-        let boundingBox = PNIBoundingBoxInteractor.default.from(bound: PNBound(min: [-0.5, -0.5, -0.5],
-                                                                               max: [0.5, 0.5, 0.5]))
-        return PNMesh(boundingBox: boundingBox,
+        let bound = PNBound(min: [-0.5, -0.5, -0.5], max: [0.5, 0.5, 0.5])
+        return PNMesh(bound: bound,
                       vertexBuffer: verticesBuffer,
                       pieceDescriptions: [pieceDescription])
     }
@@ -83,9 +82,7 @@ extension PNMesh {
                                         primitiveType: .triangle)
         let pieceDescription = PNPieceDescription(drawDescription: drawDescription,
                                                   material: material)
-        let interactor = PNIBoundingBoxInteractor.default
-        return PNMesh(boundingBox: interactor.from(bound: PNBound(min: [-1, -1, 0],
-                                                                  max: [1, 1, 0])),
+        return PNMesh(bound: PNBound(min: [-1, -1, 0], max: [1, 1, 0]),
                       vertexBuffer: verticesBuffer,
                       pieceDescriptions: [pieceDescription])
     }

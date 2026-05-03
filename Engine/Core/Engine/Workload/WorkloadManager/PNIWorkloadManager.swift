@@ -26,7 +26,7 @@ public class PNIWorkloadManager: PNWorkloadManager {
         nodeUpdate.update(rootNode: sceneGraph.rootNode)
         let scene = transcriber.transcribe(scene: sceneGraph)
         if PNDefaults.shared.debug.boundingBoxes {
-            let geometry = PNBoundingBoxCreator.vertices(boundingBoxes: scene.boundingBoxes)
+            let geometry = PNBoundingBoxCreator.vertices(bounds: scene.bounds)
             bufferStore.boundingBoxes.upload(data: geometry)
         }
         bufferStore.matrixPalettes.upload(data: scene.palettes)

@@ -5,7 +5,7 @@
 func validate(scene: PNSceneDescription) -> Bool {
     let entityReferences = cmp(scene.entities.count,
                                scene.uniforms.count,
-                               scene.boundingBoxes.count)
+                               scene.bounds.count)
     let paletteReferences = cmp(scene.animatedModels.count,
                                 scene.paletteOffset.count)
     let cameraReferences = cmp(scene.cameras.count,

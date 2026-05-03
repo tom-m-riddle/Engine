@@ -22,7 +22,7 @@ public protocol PNOmniLight {
     /// The inverse of the projection matrix.
     var projectionMatrixInverse: simd_float4x4 { get }
     /// The bounding box of the light in world space.
-    var boundingBox: PNBoundingBox { get }
+    var bound: PNBound { get }
     /// The far plane distance for view/projection calculations.
     var farPlane: Float { get }
     /// The near plane distance for view/projection calculations.

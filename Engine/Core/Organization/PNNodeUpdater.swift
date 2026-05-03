@@ -5,7 +5,7 @@
 import simd
 
 class PNNodeUpdater {
-    private let interactor = PNIBoundingBoxInteractor.default
+    private let interactor = PNIBoundInteractor()
     init() {
         // Empty
     }
@@ -22,44 +22,26 @@ class PNNodeUpdater {
                                                    modelMatrixInverse: concatenatedTransform.inverse)
 
         if node.children.isEmpty {
-            if let bb = node.data.intrinsicBoundingBox {
-                let aabb = interactor.aabb(interactor.multiply(node.data.transform, bb))
-                node.data.localBoundingBox = aabb
-            } else {
-                node.data.localBoundingBox = nil
-            }
-            node.data.childrenMergedBoundingBox = nil
+            node.data.localBound = node.data.intrinsicBound.map { interactor.multiply(node.data.transform, $0) }
+            node.data.childrenMergedBound = nil
         } else {
             for child in node.children {
                 update(from: child, worldTransform: concatenatedTransform)
             }
-            let localBoundingBoxes = node.children.compactMap { $0.data.localBoundingBox }
-            let mergedLocalBoundingBoxes = localBoundingBoxes.reduce(interactor.merge(_:_:))
-            node.data.childrenMergedBoundingBox = mergedLocalBoundingBoxes
+            let localBounds = node.children.compactMap { $0.data.localBound }
+            let mergedLocalBounds = localBounds.reduce { interactor.merge($0, rhs: $1) }
+            node.data.childrenMergedBound = mergedLocalBounds
 
-            if let bb = node.data.intrinsicBoundingBox {
-                if let childrenBB = mergedLocalBoundingBoxes {
-                    let merged = interactor.merge(bb, childrenBB)
-                    let aabb = interactor.aabb(interactor.multiply(node.data.transform, merged))
-                    node.data.localBoundingBox = aabb
+            if let bb = node.data.intrinsicBound {
+                if let childrenBound = mergedLocalBounds {
+                    node.data.localBound = interactor.multiply(node.data.transform, interactor.merge(bb, rhs: childrenBound))
                 } else {
-                    let aabb = interactor.aabb(interactor.multiply(node.data.transform, bb))
-                    node.data.localBoundingBox = aabb
+                    node.data.localBound = interactor.multiply(node.data.transform, bb)
                 }
             } else {
-                if let childrenBB = mergedLocalBoundingBoxes {
-                    let aabb = interactor.aabb(interactor.multiply(node.data.transform, childrenBB))
-                    node.data.localBoundingBox = aabb
-                } else {
-                    node.data.localBoundingBox = nil
-                }
+                node.data.localBound = mergedLocalBounds.map { interactor.multiply(node.data.transform, $0) }
             }
         }
-        if let localBoundingBox = node.data.localBoundingBox {
-            let aabb = interactor.aabb(interactor.multiply(worldTransform, localBoundingBox))
-            node.data.worldBoundingBox = aabb
-        } else {
-            node.data.worldBoundingBox = nil
-        }
+        node.data.worldBound = node.data.localBound.map { interactor.multiply(worldTransform, $0) }
     }
 }

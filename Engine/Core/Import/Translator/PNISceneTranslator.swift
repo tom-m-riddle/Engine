@@ -8,7 +8,7 @@ import PNShared
 
 public final class PNISceneTranslator: PNSceneTranslator {
     private let device: MTLDevice
-    private let interactor = PNIBoundingBoxInteractor.default
+    private let interactor = PNIBoundInteractor()
     private var materialCache = [String: PNMaterial]()
     public init(device: MTLDevice) {
         self.device = device
@@ -138,7 +138,7 @@ public final class PNISceneTranslator: PNSceneTranslator {
             }
         }
 
-        return PNMesh(boundingBox: interactor.from(bound: mesh.boundingBox.pnBound),
+        return PNMesh(bound: mesh.boundingBox.pnBound,
                       vertexBuffer: dataBuffer,
                       pieceDescriptions: pieceDescriptions)
     }

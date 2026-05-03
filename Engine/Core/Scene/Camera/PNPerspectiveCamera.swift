@@ -9,7 +9,7 @@ import simd
 public struct PNPerspectiveCamera: PNCamera {
     public let projectionMatrix: matrix_float4x4
     public let projectionMatrixInverse: matrix_float4x4
-    public let boundingBox: PNBoundingBox
+    public let bound: PNBound
     public init(nearPlane: Float,
                 farPlane: Float,
                 fovRadians: Float,
@@ -19,6 +19,6 @@ public struct PNPerspectiveCamera: PNCamera {
                                                                           nearZ: nearPlane,
                                                                           farZ: farPlane)
         projectionMatrixInverse = projectionMatrix.inverse
-        boundingBox = PNIBoundingBoxInteractor.default.from(inverseProjection: projectionMatrixInverse)
+        bound = PNIBoundInteractor().from(inverseProjection: projectionMatrixInverse)
     }
 }

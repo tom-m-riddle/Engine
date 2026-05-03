@@ -2,6 +2,8 @@
 //  Copyright © 2021 Mateusz Stompór. All rights reserved.
 //
 
+import simd
+
 public struct PNIBoundInteractor: PNBoundInteractor {
     public init() {
         // Default
@@ -61,5 +63,38 @@ public struct PNIBoundInteractor: PNBoundInteractor {
         [avg(bound.min.x, bound.max.x),
          avg(bound.min.y, bound.max.y),
          avg(bound.min.z, bound.max.z)]
+    }
+    public func corners(_ bound: PNBound) -> [simd_float3] {
+        [simd_float3(bound.min.x, bound.min.y, bound.min.z),
+         simd_float3(bound.max.x, bound.min.y, bound.min.z),
+         simd_float3(bound.min.x, bound.min.y, bound.max.z),
+         simd_float3(bound.max.x, bound.min.y, bound.max.z),
+         simd_float3(bound.min.x, bound.max.y, bound.min.z),
+         simd_float3(bound.max.x, bound.max.y, bound.min.z),
+         simd_float3(bound.min.x, bound.max.y, bound.max.z),
+         simd_float3(bound.max.x, bound.max.y, bound.max.z)]
+    }
+    public func from(_ corners: [simd_float3]) -> PNBound {
+        var minV = simd_float3(repeating: Float.infinity)
+        var maxV = simd_float3(repeating: -Float.infinity)
+        for c in corners {
+            minV = simd_min(minV, c)
+            maxV = simd_max(maxV, c)
+        }
+        return PNBound(min: minV, max: maxV)
+    }
+    public func multiply(_ lhs: simd_float4x4, _ rhs: PNBound) -> PNBound {
+        from(corners(rhs).map { (lhs * simd_float4($0, 1)).xyz })
+    }
+    public func from(inverseProjection: simd_float4x4) -> PNBound {
+        let ndcCorners: [simd_float4] = [
+            [-1, -1, 0, 1], [ 1, -1, 0, 1], [-1, -1, 1, 1], [ 1, -1, 1, 1],
+            [-1, 1, 0, 1], [ 1, 1, 0, 1], [-1, 1, 1, 1], [ 1, 1, 1, 1]
+        ]
+        return from(ndcCorners.map { v -> simd_float3 in
+            var p = inverseProjection * v
+            p /= p.w
+            return p.xyz
+        })
     }
 }

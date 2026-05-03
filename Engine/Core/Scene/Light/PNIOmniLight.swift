@@ -13,7 +13,7 @@ public struct PNIOmniLight: PNOmniLight {
     public let castsShadows: Bool
     public let projectionMatrix: simd_float4x4
     public let projectionMatrixInverse: simd_float4x4
-    public let boundingBox: PNBoundingBox
+    public let bound: PNBound
     public init(color: PNColorRGB,
                 intensity: Float,
                 influenceRadius: Float,
@@ -29,24 +29,23 @@ public struct PNIOmniLight: PNOmniLight {
                                                                              nearZ: nearPlance,
                                                                              farZ: influenceRadius)
         self.projectionMatrixInverse = projectionMatrix.inverse
-        self.boundingBox = PNIOmniLight.boundingBox(projectionMatrixInverse: projectionMatrixInverse)
+        self.bound = PNIOmniLight.computeBound(projectionMatrixInverse: projectionMatrixInverse)
         self.nearPlane = nearPlance
         self.farPlane = influenceRadius
     }
-    private static func boundingBox(projectionMatrixInverse: simd_float4x4) -> PNBoundingBox {
-        // TODO: Ensure that calling aabb(interactor.multiply(axis, projection)) is not needed
-        let interactor = PNIBoundingBoxInteractor.default
-        let projectionBoundingBox = interactor.from(inverseProjection: projectionMatrixInverse)
-        guard let boundingBox = [
-            interactor.multiply(PNSurroundings.positiveX, projectionBoundingBox),
-            interactor.multiply(PNSurroundings.negativeX, projectionBoundingBox),
-            interactor.multiply(PNSurroundings.positiveY, projectionBoundingBox),
-            interactor.multiply(PNSurroundings.negativeY, projectionBoundingBox),
-            interactor.multiply(PNSurroundings.positiveZ, projectionBoundingBox),
-            interactor.multiply(PNSurroundings.negativeZ, projectionBoundingBox)
-        ].reduce(interactor.merge) else {
+    private static func computeBound(projectionMatrixInverse: simd_float4x4) -> PNBound {
+        let interactor = PNIBoundInteractor()
+        let projectionBound = interactor.from(inverseProjection: projectionMatrixInverse)
+        guard let merged = [
+            interactor.multiply(PNSurroundings.positiveX, projectionBound),
+            interactor.multiply(PNSurroundings.negativeX, projectionBound),
+            interactor.multiply(PNSurroundings.positiveY, projectionBound),
+            interactor.multiply(PNSurroundings.negativeY, projectionBound),
+            interactor.multiply(PNSurroundings.positiveZ, projectionBound),
+            interactor.multiply(PNSurroundings.negativeZ, projectionBound)
+        ].reduce({ interactor.merge($0, rhs: $1) }) else {
             fatalError("Reduce returned nil even if it never should in this circumstances")
         }
-        return boundingBox
+        return merged
     }
 }
