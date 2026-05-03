@@ -56,10 +56,10 @@ Scenes are built from nodes in `Engine/Core/Organization/`. The scene graph supp
 
 ### Pipeline from Asset to Frame
 
-1. **Import** (`Engine/Core/Import/`) — USDZ models and height-map meshes are loaded via Model I/O.
-2. **Translation** (`Engine/Core/Translation/`) — Scene descriptions are validated and converted to render-ready representations with render masks.
-3. **Rendering** (`Engine/Core/Rendering/`) — The `Transcriber` drives the deferred pipeline each frame, consuming scene descriptions.
-4. **Buffers** (`Engine/Core/Buffers/`) — `DynamicBuffer` and `FlatTree` manage GPU-visible memory; `DataBuffer` wraps raw Metal buffers.
+- **Import** (`Engine/Core/Import/`) — USDZ models and height-map meshes are loaded via Model I/O.
+- **Translation** (`Engine/Core/Translation/`) — Scene descriptions are validated and converted to render-ready representations with render masks.
+- **Rendering** (`Engine/Core/Rendering/`) — The `Transcriber` drives the deferred pipeline each frame, consuming scene descriptions.
+- **Buffers** (`Engine/Core/Buffers/`) — `DynamicBuffer` and `FlatTree` manage GPU-visible memory; `DataBuffer` wraps raw Metal buffers.
 
 ### Engine Entry Point
 
