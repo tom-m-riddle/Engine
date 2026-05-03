@@ -12,10 +12,10 @@ public protocol PNSceneNode: AnyObject {
     var worldTransform: PNM2WTransform { get set }
     var enclosingNode: PNScenePiece? { get set }
     var modelUniforms: PNWModelUniforms { get set }
-    var localBoundingBox: PNBoundingBox? { get set }
-    var worldBoundingBox: PNBoundingBox? { get set }
-    var childrenMergedBoundingBox: PNBoundingBox? { get set }
-    var intrinsicBoundingBox: PNBoundingBox? { get }
+    var localBound: PNBound? { get set }
+    var worldBound: PNBound? { get set }
+    var childrenMergedBound: PNBound? { get set }
+    var intrinsicBound: PNBound? { get }
     func update()
     func write(scene: PNSceneDescription, parentIdx: PNParentIndex) -> PNNewlyWrittenIndex
 }

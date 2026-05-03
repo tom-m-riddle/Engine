@@ -11,10 +11,10 @@ public final class PNICameraNode: PNCameraNode {
     public var worldTransform: PNM2WTransform
     public weak var enclosingNode: PNScenePiece?
     public var modelUniforms: PNWModelUniforms
-    public var localBoundingBox: PNBoundingBox?
-    public var worldBoundingBox: PNBoundingBox?
-    public var childrenMergedBoundingBox: PNBoundingBox?
-    public let intrinsicBoundingBox: PNBoundingBox?
+    public var localBound: PNBound?
+    public var worldBound: PNBound?
+    public var childrenMergedBound: PNBound?
+    public let intrinsicBound: PNBound?
 
     public init(camera: PNCamera,
                 transform: PNLTransform,
@@ -25,10 +25,10 @@ public final class PNICameraNode: PNCameraNode {
         self.worldTransform = .identity
         self.enclosingNode = nil
         self.modelUniforms = .identity
-        self.localBoundingBox = nil
-        self.worldBoundingBox = nil
-        self.intrinsicBoundingBox = camera.boundingBox
-        self.childrenMergedBoundingBox = nil
+        self.localBound = nil
+        self.worldBound = nil
+        self.intrinsicBound = camera.bound
+        self.childrenMergedBound = nil
     }
 
     public func write(scene: PNSceneDescription, parentIdx: PNParentIndex) -> PNNewlyWrittenIndex {

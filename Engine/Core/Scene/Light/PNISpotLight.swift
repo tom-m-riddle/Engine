@@ -14,7 +14,7 @@ public struct PNISpotLight: PNSpotLight {
     public let castsShadows: Bool
     public let projectionMatrix: simd_float4x4
     public let projectionMatrixInverse: simd_float4x4
-    public let boundingBox: PNBoundingBox
+    public let bound: PNBound
     public init(color: PNColorRGB,
                 intensity: Float,
                 influenceRadius: Float,
@@ -33,7 +33,7 @@ public struct PNISpotLight: PNSpotLight {
         self.projectionMatrix = PNISpotLight.projectionMatrix(coneAngle: coneAngle,
                                                               influenceRadius: influenceRadius)
         self.projectionMatrixInverse = projectionMatrix.inverse
-        self.boundingBox = PNIBoundingBoxInteractor.default.from(inverseProjection: projectionMatrixInverse)
+        self.bound = PNIBoundInteractor().from(inverseProjection: projectionMatrixInverse)
     }
     static func projectionMatrix(coneAngle: PNRadians, influenceRadius: Float) -> simd_float4x4 {
         simd_float4x4.perspectiveProjectionRightHand(fovyRadians: coneAngle,

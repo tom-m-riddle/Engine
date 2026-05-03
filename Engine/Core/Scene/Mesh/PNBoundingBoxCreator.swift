@@ -5,58 +5,29 @@
 import PNShared
 
 enum PNBoundingBoxCreator {
-    static func vertices(boundingBoxes: [PNBoundingBox?]) -> [VertexP] {
-        boundingBoxes.compactMap { $0 } .map { vertices(bb: $0) }.reduce(+) ?? []
+    private static let interactor = PNIBoundInteractor()
+    static func vertices(bounds: [PNBound?]) -> [VertexP] {
+        bounds.compactMap { $0 }.map { vertices(bound: $0) }.reduce(+) ?? []
     }
-    static private func vertices(bb: PNBoundingBox) -> [VertexP] {
-        [
-            VertexP(position: bb.cornersLower.columns.0.xyz),
-            VertexP(position: bb.cornersLower.columns.1.xyz),
-
-            VertexP(position: bb.cornersLower.columns.1.xyz),
-            VertexP(position: bb.cornersLower.columns.3.xyz),
-
-            VertexP(position: bb.cornersLower.columns.1.xyz),
-            VertexP(position: bb.cornersLower.columns.2.xyz),
-
-            VertexP(position: bb.cornersLower.columns.2.xyz),
-            VertexP(position: bb.cornersLower.columns.3.xyz),
-
-            VertexP(position: bb.cornersLower.columns.2.xyz),
-            VertexP(position: bb.cornersLower.columns.0.xyz),
-
-            VertexP(position: bb.cornersLower.columns.3.xyz),
-            VertexP(position: bb.cornersLower.columns.0.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.0.xyz),
-            VertexP(position: bb.cornersLower.columns.0.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.1.xyz),
-            VertexP(position: bb.cornersLower.columns.1.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.2.xyz),
-            VertexP(position: bb.cornersLower.columns.2.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.3.xyz),
-            VertexP(position: bb.cornersLower.columns.3.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.0.xyz),
-            VertexP(position: bb.cornersUpper.columns.1.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.1.xyz),
-            VertexP(position: bb.cornersUpper.columns.3.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.1.xyz),
-            VertexP(position: bb.cornersUpper.columns.2.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.2.xyz),
-            VertexP(position: bb.cornersUpper.columns.3.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.2.xyz),
-            VertexP(position: bb.cornersUpper.columns.0.xyz),
-
-            VertexP(position: bb.cornersUpper.columns.3.xyz),
-            VertexP(position: bb.cornersUpper.columns.0.xyz)
+    static private func vertices(bound: PNBound) -> [VertexP] {
+        let c = interactor.corners(bound)
+        return [
+            VertexP(position: c[0]), VertexP(position: c[1]),
+            VertexP(position: c[1]), VertexP(position: c[3]),
+            VertexP(position: c[1]), VertexP(position: c[2]),
+            VertexP(position: c[2]), VertexP(position: c[3]),
+            VertexP(position: c[2]), VertexP(position: c[0]),
+            VertexP(position: c[3]), VertexP(position: c[0]),
+            VertexP(position: c[4]), VertexP(position: c[0]),
+            VertexP(position: c[5]), VertexP(position: c[1]),
+            VertexP(position: c[6]), VertexP(position: c[2]),
+            VertexP(position: c[7]), VertexP(position: c[3]),
+            VertexP(position: c[4]), VertexP(position: c[5]),
+            VertexP(position: c[5]), VertexP(position: c[7]),
+            VertexP(position: c[5]), VertexP(position: c[6]),
+            VertexP(position: c[6]), VertexP(position: c[7]),
+            VertexP(position: c[6]), VertexP(position: c[4]),
+            VertexP(position: c[7]), VertexP(position: c[4])
         ]
     }
 }

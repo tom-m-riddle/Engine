@@ -12,7 +12,7 @@ class PNITranscriberTests: XCTestCase {
         let scene = transcriber.transcribe(scene: PNScene.default)
         XCTAssertEqual(scene.entities.count, 1)
         XCTAssertEqual(scene.uniforms.count, 1)
-        XCTAssertEqual(scene.boundingBoxes.count, 1)
+        XCTAssertEqual(scene.bounds.count, 1)
         XCTAssertTrue(scene.models.isEmpty)
         XCTAssertTrue(scene.animatedModels.isEmpty)
         XCTAssertTrue(scene.paletteOffset.isEmpty)

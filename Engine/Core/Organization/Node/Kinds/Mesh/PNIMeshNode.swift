@@ -12,10 +12,10 @@ public final class PNIMeshNode: PNMeshNode {
     public var worldTransform: PNM2WTransform
     public weak var enclosingNode: PNScenePiece?
     public var modelUniforms: PNWModelUniforms
-    public var localBoundingBox: PNBoundingBox?
-    public var worldBoundingBox: PNBoundingBox?
-    public var childrenMergedBoundingBox: PNBoundingBox?
-    public let intrinsicBoundingBox: PNBoundingBox?
+    public var localBound: PNBound?
+    public var worldBound: PNBound?
+    public var childrenMergedBound: PNBound?
+    public let intrinsicBound: PNBound?
     public init(mesh: PNMesh,
                 transform: PNLTransform,
                 name: String = "") {
@@ -25,10 +25,10 @@ public final class PNIMeshNode: PNMeshNode {
         self.worldTransform = .identity
         self.enclosingNode = nil
         self.modelUniforms = .identity
-        self.localBoundingBox = nil
-        self.worldBoundingBox = nil
-        self.childrenMergedBoundingBox = nil
-        self.intrinsicBoundingBox = mesh.boundingBox
+        self.localBound = nil
+        self.worldBound = nil
+        self.childrenMergedBound = nil
+        self.intrinsicBound = mesh.bound
     }
     public func write(scene: PNSceneDescription, parentIdx: PNParentIndex) -> PNNewlyWrittenIndex {
         let entity = PNEntity(type: .mesh,

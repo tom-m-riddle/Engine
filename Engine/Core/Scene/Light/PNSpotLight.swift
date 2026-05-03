@@ -19,5 +19,5 @@ public protocol PNSpotLight {
     var castsShadows: Bool { get }
     var projectionMatrix: simd_float4x4 { get }
     var projectionMatrixInverse: simd_float4x4 { get }
-    var boundingBox: PNBoundingBox { get }
+    var bound: PNBound { get }
 }

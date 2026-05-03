@@ -68,10 +68,8 @@ public final class PNIEngine: PNEngine {
             assertionFailure("Could not retrieve device from the view")
             return nil
         }
-        let interactor = PNIBoundingBoxInteractor.default
-        let cullingController = PNICullingController(interactor: interactor)
-        let maskGenerator = PNIRenderMaskGenerator(cullingController: cullingController,
-                                                   interactor: interactor)
+        let cullingController = PNICullingController(interactor: PNIBoundInteractor())
+        let maskGenerator = PNIRenderMaskGenerator(cullingController: cullingController)
         return PNIEngine(view: view,
                          renderingSize: renderingSize,
                          scene: scene,

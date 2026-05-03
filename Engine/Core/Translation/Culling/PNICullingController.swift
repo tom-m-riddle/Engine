@@ -5,15 +5,14 @@
 import PNShared
 
 struct PNICullingController: PNCullingController {
-    private let interactor: PNBoundingBoxInteractor
-    init(interactor: PNBoundingBoxInteractor) {
+    private let interactor: PNBoundInteractor
+    init(interactor: PNBoundInteractor) {
         self.interactor = interactor
     }
-    func cullingMask(scene: PNSceneDescription,
-                     boundingBox: PNWBoundingBox) -> [Bool] {
-        scene.boundingBoxes.indices.map {
-            if let box = scene.boundingBoxes[$0] {
-                return interactor.overlap(box, boundingBox)
+    func cullingMask(scene: PNSceneDescription, bound: PNBound) -> [Bool] {
+        scene.bounds.indices.map {
+            if let box = scene.bounds[$0] {
+                return interactor.overlap(box, bound)
             } else {
                 return true
             }

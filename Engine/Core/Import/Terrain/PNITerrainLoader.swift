@@ -107,7 +107,7 @@ public struct PNITerrainLoader: PNTerrainLoader {
             pieces.append(PNPieceDescription(drawDescription: submesh, material: material))
         }
         let bound = PNIBoundEstimator().bound(vertexBuffer: verts)
-        return PNMesh(boundingBox: PNIBoundingBoxInteractor.default.from(bound: bound),
+        return PNMesh(bound: bound,
                       vertexBuffer: PNDataBuffer(buffer: buffer, length: verts.count, label: "Vertices"),
                       pieceDescriptions: pieces)
     }

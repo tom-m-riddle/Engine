@@ -5,7 +5,6 @@
 import simd
 
 /// Represents the opposite, extreme points of an abstract object in 3D space.
-/// A shortened version of ``PNBoundingBox`` for simpler cases.
 public struct PNBound: CustomDebugStringConvertible {
     /// The minimum (lowest) corner point of the bound in 3D space.
     public let min: simd_float3
